@@ -1,0 +1,83 @@
+show databases;
+create database insurance1;
+use insurance1;
+create table car(reg_num varchar(10),model varchar(10),year int, primary key(reg_num));
+
+create table accident(report_num int, accident_date date, location varchar(20),primary key(report_num));
+
+create table person (driver_id varchar(10),name varchar(20), address varchar(30), primary key(driver_id));
+
+drop table owns;
+drop table participated;
+
+create table owns(driver_id varchar(10),reg_num varchar(10),
+primary key(driver_id, reg_num),
+foreign key(driver_id) references person(driver_id)on delete cascade,
+foreign key(reg_num) references car(reg_num)on delete cascade);
+
+create table participated(driver_id varchar(10),reg_num varchar(10),report_num int, damage_amount int,
+primary key(driver_id, reg_num, report_num),
+foreign key(driver_id) references person(driver_id)on delete cascade,
+foreign key(reg_num) references car(reg_num)on delete cascade,
+foreign key(report_num) references accident(report_num)on delete cascade);
+
+show tables;
+
+desc accident;
+desc car;
+desc owns;
+desc participated;
+desc person;
+
+insert into accident values(11,'2003-01-01','Mysore Road');
+insert into accident values (12,'2004-02-02','South end Circle');
+insert into accident values (13,'2003-01-21','Bull temple Road');
+insert into accident values (14,'2008-02-17','Mysore Road');
+insert into accident values (15,'2004-03-05','Kanakpura Road');
+
+select * from accident;
+
+insert into car values('KA01AB1234','BMW',2010);
+insert into car values('KA01AB5678','MERCEDES',2010);
+insert into car values('KA01AB5670','AUDI',2010);
+insert into car values('KA01AB1314','PORSCHE',2010);
+insert into car values('KA01AB1516','JAGUAR',2010);
+drop table car;
+
+SELECT * from car;
+
+insert into person values('IND12345KA','yash','indiranagar');
+insert into person values('IND67891KA','krsna','jaynagar');
+insert into person values('IND11123KA','zayd','basvangudi');
+insert into person values('IND13145KA','shamil','mathikere');
+insert into person values('IND09876KA','tanisha','hublli');
+
+select * from person;
+
+insert into owns values('IND12345KA','KA01AB1234');
+insert into owns values('IND67891KA','KA01AB5678');
+insert into owns values('IND11123KA','KA01AB5678');
+insert into owns values('IND13145KA','KA01AB1314');
+insert into owns values('IND09876KA','KA01AB1516');
+
+select * from owns;
+
+insert into participated values('IND12345KA','KA01AB1234',11,100000);
+insert into participated values('IND67891KA','KA01AB5678',12,150000);
+insert into participated values('IND11123KA','KA01AB5678',13,200000);
+insert into participated values('IND13145KA','KA01AB1314',14,120000);
+insert into participated values('IND09876KA','KA01AB1516',15,175000);
+
+select * from participated;
+
+select accident_date,location from accident;
+
+update participated set damage_amount=25000 where reg_num='KA01AB5678' and report_num=13;
+
+select driver_id from participated where damage_amount>25000;
+
+SELECT * FROM PARTICIPATED ORDER BY DAMAGE_AMOUNT DESC;
+
+SELECT AVG(DAMAGE_AMOUNT) FROM PARTICIPATED;
+
+SELECT MAX(DAMAGE_AMOUNT) FROM PARTICIPATED;
