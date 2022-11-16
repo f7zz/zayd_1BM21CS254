@@ -1,0 +1,140 @@
+show databases;
+create database insurance;
+use insurance;
+create table car(reg_num varchar(10),model varchar(10),year int, primary key(reg_num));
+
+create table accident(report_num int, accident_date date, location varchar(20),primary key(report_num));
+
+create table person (driver_id varchar(10),name varchar(20), address varchar(30), primary key(driver_id));
+
+create table owns(driver_id varchar(10),reg_num varchar(10),
+primary key(driver_id, reg_num),
+foreign key(driver_id) references person(driver_id)on delete cascade,
+foreign key(reg_num) references car(reg_num)on delete cascade);
+
+create table participated(driver_id varchar(10),reg_num varchar(10),report_num int, damage_amount int,
+primary key(driver_id, reg_num, report_num),
+foreign key(driver_id) references person(driver_id)on delete cascade,
+foreign key(reg_num) references car(reg_num)on delete cascade,
+foreign key(report_num) references accident(report_num)on delete cascade);
+
+show tables;
+
+desc accident;
+desc car;
+desc owns;
+desc participated;
+desc person;
+
+insert into accident values(11,'2003-01-01','Mysore Road');
+insert into accident values (12,'2004-02-02','South end Circle');
+insert into accident values (13,'2003-01-21','Bull temple Road');
+insert into accident values (14,'2008-02-17','Mysore Road');
+insert into accident values (15,'2004-03-05','Kanakpura Road');
+
+select * from accident;
+11	2003-01-01	Mysore Road
+12	2004-02-02	South end Circle
+13	2003-01-21	Bull temple Road
+14	2008-02-17	Mysore Road
+15	2004-03-05	Kanakpura Road
+		
+
+insert into car values('KA01AB1234','BMW',2010);
+insert into car values('KA01AB5678','MERCEDES',2010);
+insert into car values('KA01BA5678','AUDI',2010);
+insert into car values('KA01AB1314','PORSCHE',2010);
+insert into car values('KA01AB1516','JAGUAR',2010);
+
+SELECT * from car;
+KA01AB1234	BMW		2010
+KA01AB1314	PORSCHE	2010
+KA01AB1516	JAGUAR	2010
+KA01AB5678	MERCEDES	2010
+KA01BA5678	AUDI		2010
+		
+
+insert into person values('IND12345KA','yash','indiranagar');
+insert into person values('IND67891KA','krsna','jaynagar');
+insert into person values('IND11123KA','zayd','basvangudi');
+insert into person values('IND13145KA','shamil','mathikere');
+insert into person values('IND09876KA','tanisha','hublli');
+
+select * from person;
+IND09876KA	tanisha	hublli
+IND11123KA	zayd		basvangudi
+IND12345KA	yash		indiranagar
+IND13145KA	shamil	mathikere
+IND67891KA	krsna		jaynagar
+		
+
+insert into owns values('IND12345KA','KA01AB1234');
+insert into owns values('IND67891KA','KA01AB5678');
+insert into owns values('IND11123KA','KA01BA5678');
+insert into owns values('IND13145KA','KA01AB1314');
+insert into owns values('IND09876KA','KA01AB1516');
+
+select * from owns;
+IND12345KA	KA01AB1234
+IND13145KA	KA01AB1314
+IND09876KA	KA01AB1516
+IND67891KA	KA01AB5678
+IND11123KA	KA01BA5678
+	
+
+>insert into participated values('IND12345KA','KA01AB1234',11,100000);
+>insert into participated values('IND67891KA','KA01AB5678',12,150000);
+>insert into participated values('IND11123KA','KA01BA5678',13,200000);
+>insert into participated values('IND13145KA','KA01AB1314',14,120000);
+>insert into participated values('IND09876KA','KA01AB1516',15,175000);
+
+>select * from participated;
+IND09876KA	KA01AB1516	15	175000
+IND11123KA	KA01BA5678	13	200000
+IND12345KA	KA01AB1234	11	100000
+IND13145KA	KA01AB1314	14	120000
+IND67891KA	KA01AB5678	12	150000
+			
+
+
+QUERIES:-
+
+>select * from car order by year asc;
+KA01AB1234	BMW		2010
+KA01AB1314	PORSCHE	2010
+KA01AB1516	JAGUAR	2010
+KA01AB5678	MERCEDES	2010
+KA01BA5678	AUDI		2010
+
+>select count(*) from participated p, car c where c.reg_num=p.reg_num and c.model='BMW';
+1
+
+>select count(distinct driver_id)CNT from participated p,accident a where p.report_num=a.report_num and a.accident_date like '__08%';
+1
+
+>select * from participated order by damage_amount desc;
+IND11123KA	KA01BA5678	13	200000
+IND09876KA	KA01AB1516	15	175000
+IND67891KA	KA01AB5678	12	150000
+IND13145KA	KA01AB1314	14	120000
+IND12345KA	KA01AB1234	11	100000
+
+>select avg(damage_amount) average from participated;
+149000.0000
+
+>delte from participated where damage_amount<(select t.damount from (select avg(damage_amount) as damount from participated) t);
+IND09876KA	KA01AB1516	15	175000
+IND11123KA	KA01BA5678	13	200000
+IND67891KA	KA01AB5678	12	150000
+			
+>select p.name from person p, participated pa where pa.driver_id=p.driver_id and pa.damage_amount>(select avg(damage_amount) average from participated);
+jake
+zayd
+krsna
+
+>select max(damage_amount) from participated;
+200000
+
+count the number of accidents in which a particular driver was involved and it took place in the year 2001
+>select count(*) from accident a, participated p where a.report_num=p.report_num and a.accident_date like '2004%';
+2
